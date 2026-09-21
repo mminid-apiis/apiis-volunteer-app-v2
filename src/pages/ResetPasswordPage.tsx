@@ -29,11 +29,11 @@ export function ResetPasswordPage() {
     e.preventDefault()
     setError(null)
     if (password.length < 6) {
-      setError('Password must be at least 6 characters.')
+      setError('Password minimal 6 karakter.')
       return
     }
     if (password !== confirm) {
-      setError('Passwords do not match.')
+      setError('Password tidak cocok.')
       return
     }
     setSubmitting(true)
@@ -43,7 +43,7 @@ export function ResetPasswordPage() {
       setSubmitting(false)
       return
     }
-    toast.success('Password updated. You are now signed in.')
+    toast.success('Password berhasil diperbarui. Kamu sudah masuk.')
     navigate('/', { replace: true })
   }
 
@@ -57,23 +57,23 @@ export function ResetPasswordPage() {
         </div>
         <Card className="w-full shadow-xl">
           <CardHeader className="text-center">
-            <CardTitle className="text-xl">Set a new password</CardTitle>
+            <CardTitle className="text-xl">Atur password baru</CardTitle>
           </CardHeader>
           <CardContent>
             {!session ? (
               <div className="flex flex-col gap-3 text-center">
                 <p className="text-muted-foreground text-sm">
-                  This reset link is invalid or has expired. Please request a new one from the sign-in
-                  page.
+                  Link reset ini tidak valid atau sudah kedaluwarsa. Minta link baru dari halaman
+                  masuk.
                 </p>
                 <Button variant="outline" onClick={() => navigate('/login', { replace: true })}>
-                  Back to sign in
+                  Kembali ke halaman masuk
                 </Button>
               </div>
             ) : (
               <form onSubmit={onSubmit} className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
-                  <Label htmlFor="new-password">New password</Label>
+                  <Label htmlFor="new-password">Password baru</Label>
                   <div className="relative">
                     <Input
                       id="new-password"
@@ -88,7 +88,7 @@ export function ResetPasswordPage() {
                       type="button"
                       onClick={() => setShow((v) => !v)}
                       className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center px-3"
-                      aria-label={show ? 'Hide password' : 'Show password'}
+                      aria-label={show ? 'Sembunyikan password' : 'Tampilkan password'}
                       tabIndex={-1}
                     >
                       {show ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
@@ -96,7 +96,7 @@ export function ResetPasswordPage() {
                   </div>
                 </div>
                 <div className="flex flex-col gap-2">
-                  <Label htmlFor="confirm-password">Confirm new password</Label>
+                  <Label htmlFor="confirm-password">Konfirmasi password baru</Label>
                   <Input
                     id="confirm-password"
                     type={show ? 'text' : 'password'}
@@ -108,7 +108,7 @@ export function ResetPasswordPage() {
                 </div>
                 {error && <p className="text-destructive text-sm">{error}</p>}
                 <Button type="submit" disabled={submitting} className="w-full">
-                  {submitting ? 'Updating…' : 'Update password'}
+                  {submitting ? 'Memperbarui…' : 'Perbarui password'}
                 </Button>
               </form>
             )}

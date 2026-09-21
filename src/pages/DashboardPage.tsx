@@ -14,17 +14,17 @@ export function DashboardPage() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title="OBS Dashboard"
-        description={`Welcome, ${profile?.full_name ?? ''}. Select a group to record attendance.`}
+        title="Dashboard OBS"
+        description={`Selamat datang, ${profile?.full_name ?? ''}. Pilih grup untuk mencatat absensi.`}
       />
 
       {isLoading ? (
-        <p className="text-muted-foreground text-sm">Loading your groups…</p>
+        <p className="text-muted-foreground text-sm">Memuat grup kamu…</p>
       ) : isError ? (
-        <p className="text-destructive text-sm">Couldn’t load your groups. Please refresh and try again.</p>
+        <p className="text-destructive text-sm">Gagal memuat grup kamu. Muat ulang dan coba lagi.</p>
       ) : !groups || groups.length === 0 ? (
         <p className="text-muted-foreground text-sm">
-          No groups assigned yet. Please contact your administrator.
+          Belum ada grup yang ditugaskan. Hubungi administrator kamu.
         </p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -57,7 +57,7 @@ export function DashboardPage() {
                   <span />
                 )}
                 <Button asChild size="sm">
-                  <Link to={`/groups/${g.id}`}>Record attendance</Link>
+                  <Link to={`/groups/${g.id}`}>Catat absensi</Link>
                 </Button>
               </CardContent>
             </Card>

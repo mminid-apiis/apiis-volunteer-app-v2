@@ -27,22 +27,25 @@ export function parseCsv(text: string): string[][] {
   return rows
 }
 
+// 表头识别正则（English + 中文 + Bahasa Indonesia 同义词），dropHeader / mapCsvColumns 共用。
+const HEADER_PATTERN = /\b(name|email|class|group|phone|nama|kelas|grup|kelompok|telepon)\b|姓名|班级|组|邮箱|电话/
+
 /** 若首行看起来像表头则去掉。 */
 export function dropHeader(rows: string[][]): string[][] {
   if (rows.length === 0) return rows
   const first = rows[0].join(',').toLowerCase()
-  if (/\b(name|email|class|group|phone)\b|姓名|班级|组|邮箱|电话/.test(first)) {
+  if (HEADER_PATTERN.test(first)) {
     return rows.slice(1)
   }
   return rows
 }
 
 const COLUMN_SYNONYMS: Record<string, string[]> = {
-  name: ['name', 'full name', 'fullname', '姓名', '名字'],
+  name: ['name', 'full name', 'fullname', 'nama', 'nama lengkap', '姓名', '名字'],
   email: ['email', 'e-mail', 'email address', '邮箱', '电邮'],
-  phone: ['phone', 'phone number', 'mobile', 'tel', '电话', '手机'],
-  class: ['class', 'cohort', '班级', '班'],
-  group: ['group', '组', '小组'],
+  phone: ['phone', 'phone number', 'mobile', 'tel', 'telepon', 'no telepon', 'no hp', 'hp', '电话', '手机'],
+  class: ['class', 'cohort', 'kelas', '班级', '班'],
+  group: ['group', 'grup', 'kelompok', '组', '小组'],
 }
 
 /**
@@ -55,7 +58,7 @@ export function mapCsvColumns(
   defaults: Record<string, number>,
 ): { body: string[][]; get: (row: string[], field: string) => string } {
   const headerLine = rows.length ? rows[0].join(',').toLowerCase() : ''
-  const hasHeader = /\b(name|email|class|group|phone)\b|姓名|班级|组|邮箱|电话/.test(headerLine)
+  const hasHeader = HEADER_PATTERN.test(headerLine)
   const idx: Record<string, number> = {}
   let body = rows
   if (hasHeader) {

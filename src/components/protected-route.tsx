@@ -14,10 +14,10 @@ export function ProtectedRoute() {
     return (
       <div className="flex min-h-svh flex-col items-center justify-center gap-4 p-6 text-center">
         <p className="text-muted-foreground text-sm">
-          Couldn&apos;t load your profile. Please contact an administrator or sign in again.
+          Gagal memuat profil kamu. Hubungi administrator atau coba masuk lagi.
         </p>
         <Button variant="outline" onClick={() => void signOut()}>
-          Sign in again
+          Masuk lagi
         </Button>
       </div>
     )

@@ -18,8 +18,8 @@ export function AvailabilityActions({ volunteerId, week }: { volunteerId: string
     setAvail.mutate(
       { groupId, isAvailable: v },
       {
-        onSuccess: () => toast.success('Response saved'),
-        onError: (e) => toast.error(`Failed: ${(e as Error).message}`),
+        onSuccess: () => toast.success('Jawaban tersimpan'),
+        onError: (e) => toast.error(`Gagal: ${(e as Error).message}`),
       },
     )
   }
@@ -41,7 +41,7 @@ export function AvailabilityActions({ volunteerId, week }: { volunteerId: string
               disabled={setAvail.isPending || closed}
               onClick={() => set(g.id, true)}
             >
-              Yes
+              Ya
             </Button>
             <Button
               variant={cur === false ? 'default' : 'outline'}
@@ -49,11 +49,11 @@ export function AvailabilityActions({ volunteerId, week }: { volunteerId: string
               disabled={setAvail.isPending || closed}
               onClick={() => set(g.id, false)}
             >
-              No
+              Tidak
             </Button>
             {cur !== null && (
               <span className="text-muted-foreground text-xs">
-                {cur ? 'available' : 'not available'}
+                {cur ? 'bisa hadir' : 'tidak bisa hadir'}
               </span>
             )}
           </div>
@@ -61,8 +61,8 @@ export function AvailabilityActions({ volunteerId, week }: { volunteerId: string
       })}
       <span className="text-muted-foreground text-xs">
         {closed
-          ? `Closed — responses were due ${formatDeadline(deadline)}`
-          : `Please respond by ${formatDeadline(deadline)}`}
+          ? `Ditutup — batas jawab adalah ${formatDeadline(deadline)}`
+          : `Mohon jawab sebelum ${formatDeadline(deadline)}`}
       </span>
     </div>
   )

@@ -20,22 +20,22 @@ do $$ begin
   end if;
 end $$;
 
--- 4) 四个班级
+-- 4) 四个班级（MMin 2/3，Leadership/Pastoral）
 insert into public.cohorts (id, name, is_active) values
-  ('00000000-0000-0000-0000-0000000060a0', 'MMin 6P Monday Morning',  true),
-  ('00000000-0000-0000-0000-0000000060b0', 'MMin 6L Tuesday Night',   true),
-  ('00000000-0000-0000-0000-0000000070a0', 'MMin 7P Tuesday Morning', true),
-  ('00000000-0000-0000-0000-0000000070b0', 'MMin 7L Monday Night',    true)
+  ('00000000-0000-0000-0000-0000000060a0', 'MMin 2 Leadership - Monday Evening',  true),
+  ('00000000-0000-0000-0000-0000000060b0', 'MMin 2 Pastoral - Tuesday Morning',   true),
+  ('00000000-0000-0000-0000-0000000070a0', 'MMin 3 Leadership - Tuesday Evening', true),
+  ('00000000-0000-0000-0000-0000000070b0', 'MMin 3 Pastoral - Monday Morning',    true)
 on conflict (id) do nothing;
 
--- 5) 各班级的小组 Group 1..N（共 28+43+21+64 = 156 个）
+-- 5) 各班级的小组 Group 1..N（MMin 3 两班尚未开班，暂无小组）
 insert into public.groups (cohort_id, name, meeting_day)
 select c.cid, 'Group ' || g, c.day
 from (values
-  ('00000000-0000-0000-0000-0000000060a0'::uuid, 28, 'Monday'),
-  ('00000000-0000-0000-0000-0000000060b0'::uuid, 43, 'Tuesday'),
-  ('00000000-0000-0000-0000-0000000070a0'::uuid, 21, 'Tuesday'),
-  ('00000000-0000-0000-0000-0000000070b0'::uuid, 64, 'Monday')
+  ('00000000-0000-0000-0000-0000000060a0'::uuid, 17, 'Monday'),
+  ('00000000-0000-0000-0000-0000000060b0'::uuid, 17, 'Tuesday'),
+  ('00000000-0000-0000-0000-0000000070a0'::uuid, 0, 'Tuesday'),
+  ('00000000-0000-0000-0000-0000000070b0'::uuid, 0, 'Monday')
 ) as c(cid, n, day)
 cross join lateral generate_series(1, c.n) as g
 on conflict (cohort_id, name) do nothing;

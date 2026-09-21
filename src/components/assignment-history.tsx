@@ -34,29 +34,29 @@ export function AssignmentHistory() {
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <Input
-          placeholder="Search by week, class, group, name or email…"
+          placeholder="Cari berdasarkan minggu, kelas, grup, nama, atau email…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="max-w-sm"
         />
-        <span className="text-muted-foreground text-xs">{rows.length} record(s)</span>
+        <span className="text-muted-foreground text-xs">{rows.length} catatan</span>
       </div>
       <p className="text-muted-foreground text-xs">
-        Temporary assignments (admin-assigned and coverage) archived just before the weekly Wednesday
-        clear. Roster (original) OBS are permanent — see Groups &amp; Assignments.
+        Penugasan sementara (ditugaskan admin dan pengganti) diarsipkan tepat sebelum pembersihan
+        mingguan hari Rabu. OBS daftar awal (asli) bersifat permanen — lihat Grup &amp; Penugasan.
       </p>
 
       {rows.length === 0 ? (
-        <p className="text-muted-foreground text-sm">No history yet.</p>
+        <p className="text-muted-foreground text-sm">Belum ada riwayat.</p>
       ) : (
         <div className="overflow-x-auto rounded-md border">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="whitespace-nowrap">Week (Mon)</TableHead>
-                <TableHead>Class</TableHead>
-                <TableHead>Group</TableHead>
-                <TableHead>Type</TableHead>
+                <TableHead className="whitespace-nowrap">Minggu (Sen)</TableHead>
+                <TableHead>Kelas</TableHead>
+                <TableHead>Grup</TableHead>
+                <TableHead>Jenis</TableHead>
                 <TableHead>OBS</TableHead>
                 <TableHead className="whitespace-nowrap">Email</TableHead>
               </TableRow>
@@ -78,7 +78,7 @@ export function AssignmentHistory() {
                           : 'bg-blue-700 font-normal text-white'
                       }
                     >
-                      {r.source === 'coverage' ? 'Coverage' : 'Admin-assigned'}
+                      {r.source === 'coverage' ? 'Pengganti' : 'Ditugaskan admin'}
                     </Badge>
                   </TableCell>
                   <TableCell className="font-medium">{r.volunteer_name ?? '—'}</TableCell>

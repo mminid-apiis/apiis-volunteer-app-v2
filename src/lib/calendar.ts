@@ -2,7 +2,7 @@
 // 每套课程 0~66 周的上课日期（均为周一，week 0 = Orientation）。
 // 真实日历中两套课程日期不同、各有多个 term break（break = 被跳过的周一）。
 
-export type Curriculum = 'MMin 6' | 'MMin 7'
+export type Curriculum = 'MMin 2' | 'MMin 3'
 
 export interface WeekDate {
   week: number
@@ -10,7 +10,7 @@ export interface WeekDate {
 }
 
 export const CALENDAR: Record<Curriculum, WeekDate[]> = {
-  'MMin 6': [
+  'MMin 2': [
     { week: 0, date: '2025-02-03' },
     { week: 1, date: '2025-02-10' },
     { week: 2, date: '2025-02-17' },
@@ -79,7 +79,7 @@ export const CALENDAR: Record<Curriculum, WeekDate[]> = {
     { week: 65, date: '2026-10-19' },
     { week: 66, date: '2026-10-26' },
   ],
-  'MMin 7': [
+  'MMin 3': [
     { week: 0, date: '2026-02-02' },
     { week: 1, date: '2026-02-09' },
     { week: 2, date: '2026-02-16' },
@@ -151,8 +151,8 @@ export const CALENDAR: Record<Curriculum, WeekDate[]> = {
 }
 
 const DATE_TO_WEEK: Record<Curriculum, Record<string, number>> = {
-  'MMin 6': Object.fromEntries(CALENDAR['MMin 6'].map((w) => [w.date, w.week])),
-  'MMin 7': Object.fromEntries(CALENDAR['MMin 7'].map((w) => [w.date, w.week])),
+  'MMin 2': Object.fromEntries(CALENDAR['MMin 2'].map((w) => [w.date, w.week])),
+  'MMin 3': Object.fromEntries(CALENDAR['MMin 3'].map((w) => [w.date, w.week])),
 }
 
 /** ISO 日期加 n 天（按 UTC 计算，避开时区偏移）。 */
@@ -170,11 +170,11 @@ function mondayOfWeekISO(iso: string): string {
   return addDaysISO(iso, -((dow + 6) % 7))
 }
 
-/** 班级名 → 课程体系（名字含 "MMin 7"/"MMin 6"）。无法识别返回 null。 */
+/** 班级名 → 课程体系（名字含 "MMin 3"/"MMin 2"）。无法识别返回 null。 */
 export function curriculumForClass(className: string | null | undefined): Curriculum | null {
   if (!className) return null
-  if (className.includes('MMin 7')) return 'MMin 7'
-  if (className.includes('MMin 6')) return 'MMin 6'
+  if (className.includes('MMin 3')) return 'MMin 3'
+  if (className.includes('MMin 2')) return 'MMin 2'
   return null
 }
 
@@ -207,9 +207,9 @@ export function weekForDate(c: Curriculum, dateISO: string): number | null {
   return DATE_TO_WEEK[c][mondayOfWeekISO(dateISO)] ?? null
 }
 
-/** 标签：week 0 显示 Orientation，其余 Week N。 */
+/** 标签：week 0 显示 Orientasi，其余 Minggu N。 */
 export function weekLabel(week: number): string {
-  return week === 0 ? 'Orientation' : `Week ${week}`
+  return week === 0 ? 'Orientasi' : `Minggu ${week}`
 }
 
 /** 当前/最近一周：日期 <= today 的最大周次（用作下拉默认值）。 */

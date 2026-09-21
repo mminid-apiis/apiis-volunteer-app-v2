@@ -20,14 +20,14 @@ export function NotificationsPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <PageHeader title="Notifications" />
+      <PageHeader title="Notifikasi" />
 
       <CoverageNeeded />
 
       {isLoading ? (
-        <p className="text-muted-foreground text-sm">Loading…</p>
+        <p className="text-muted-foreground text-sm">Memuat…</p>
       ) : visible.length === 0 ? (
-        <p className="text-muted-foreground text-sm">No notifications.</p>
+        <p className="text-muted-foreground text-sm">Belum ada notifikasi.</p>
       ) : (
         <div className="flex flex-col gap-2">
           {visible.map((n) => {

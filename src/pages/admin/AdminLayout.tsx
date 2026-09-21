@@ -19,14 +19,14 @@ export function AdminLayout() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title="Admin Console"
+        title="Konsol Admin"
         actions={
           <Select value={classFilter} onValueChange={setClassFilter}>
             <SelectTrigger className="w-[260px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All classes</SelectItem>
+              <SelectItem value="all">Semua kelas</SelectItem>
               {classes.map((c) => (
                 <SelectItem key={c.id} value={c.id}>
                   {c.name}

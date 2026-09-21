@@ -25,11 +25,11 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.error) {
       return (
         <div className="flex min-h-svh flex-col items-center justify-center gap-4 p-6 text-center">
-          <h1 className="text-xl font-semibold">Something went wrong</h1>
+          <h1 className="text-xl font-semibold">Terjadi kesalahan</h1>
           <p className="text-muted-foreground max-w-md text-sm break-words">
             {this.state.error.message}
           </p>
-          <Button onClick={() => window.location.reload()}>Reload</Button>
+          <Button onClick={() => window.location.reload()}>Muat ulang</Button>
         </div>
       )
     }

@@ -27,10 +27,10 @@ export function FeedbackPage() {
     if (!user || text.length === 0) return
     try {
       await submit.mutateAsync({ userId: user.id, fullName: profile?.full_name ?? '', message: text })
-      toast.success('Thanks! Your feedback was sent.')
+      toast.success('Terima kasih! Masukan kamu sudah terkirim.')
       navigate(-1)
     } catch (err) {
-      toast.error(`Failed: ${(err as Error).message}`)
+      toast.error(`Gagal: ${(err as Error).message}`)
     }
   }
 
@@ -38,15 +38,15 @@ export function FeedbackPage() {
     <div className="mx-auto w-full max-w-xl">
       <Card>
         <CardHeader>
-          <CardTitle>Send feedback</CardTitle>
+          <CardTitle>Kirim masukan</CardTitle>
           <CardDescription>
-            Tell us about a problem or a suggestion — an admin will read it.
+            Ceritakan masalah atau saran kamu — admin akan membacanya.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmit} className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="feedback-msg">Your feedback</Label>
+              <Label htmlFor="feedback-msg">Masukan kamu</Label>
               <Textarea
                 id="feedback-msg"
                 rows={6}
@@ -54,16 +54,16 @@ export function FeedbackPage() {
                 maxLength={500}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="What's working, what's not, ideas to improve…"
+                placeholder="Apa yang berjalan baik, apa yang belum, ide untuk perbaikan…"
               />
               <p className="text-muted-foreground text-right text-xs">{message.length}/500</p>
             </div>
             <div className="flex justify-end gap-2">
               <Button type="button" variant="outline" onClick={() => navigate(-1)}>
-                Cancel
+                Batal
               </Button>
               <Button type="submit" disabled={submit.isPending || !message.trim()}>
-                {submit.isPending ? 'Sending…' : 'Send feedback'}
+                {submit.isPending ? 'Mengirim…' : 'Kirim masukan'}
               </Button>
             </div>
           </form>

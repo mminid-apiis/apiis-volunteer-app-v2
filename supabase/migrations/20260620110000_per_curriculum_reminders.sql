@@ -1,6 +1,6 @@
--- 提醒按课程(MMin 6 / MMin 7)分发：新增 p_curriculum 参数。
+-- 提醒按课程(MMin 2 / MMin 3)分发：新增 p_curriculum 参数。
 --   p_curriculum 为 null  → 全部志愿者(手动 "Run now" 用,行为不变)
---   p_curriculum = 'MMin 6' / 'MMin 7' → 只通知/发给被分配到该课程班级的志愿者，
+--   p_curriculum = 'MMin 2' / 'MMin 3' → 只通知/发给被分配到该课程班级的志愿者，
 --     且按「该课程」自己的上课周判断(两套课程休息周不同)。
 -- cron 改为 4 个任务，见 pg_cron_setup.sql（或本文件末尾的重排程段）。
 

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X } from 'lucide-react'
+import { Trash2, X } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   useAssignVolunteer,
@@ -7,7 +7,7 @@ import {
   useUnassign,
   type CheckStatus,
 } from '@/hooks/use-assignments'
-import type { GroupWithCohort } from '@/hooks/use-groups'
+import { useDeleteGroup, type GroupWithCohort } from '@/hooks/use-groups'
 import type { Assignment, Profile } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -38,39 +38,53 @@ export function GroupAssignmentCard({
   const assign = useAssignVolunteer()
   const unassign = useUnassign()
   const setMark = useSetGroupCheckMark()
+  const deleteGroup = useDeleteGroup()
   const [selected, setSelected] = useState('')
 
   const groupAssignments = assignments.filter((a) => a.group_id === group.id)
   const assignedIds = new Set(groupAssignments.map((a) => a.volunteer_id))
   // 可分配名单：排除 super_admin(itsupport);名字从「全部用户」解析,故升级为 admin 后仍正确显示
   const available = users.filter((u) => u.role !== 'super_admin' && !assignedIds.has(u.id))
-  const nameOf = (id: string) => users.find((u) => u.id === id)?.full_name ?? 'Unknown'
+  const nameOf = (id: string) => users.find((u) => u.id === id)?.full_name ?? 'Tidak diketahui'
 
   async function onAssign() {
     if (!selected) return
     try {
       await assign.mutateAsync({ groupId: group.id, volunteerId: selected })
       setSelected('')
-      toast.success('OBS assigned')
+      toast.success('OBS berhasil ditugaskan')
     } catch (e) {
-      toast.error(`Failed: ${(e as Error).message}`)
+      toast.error(`Gagal: ${(e as Error).message}`)
     }
   }
 
   async function onRemove(a: Assignment) {
     try {
       await unassign.mutateAsync(a.id)
-      toast.success('Assignment removed')
+      toast.success('Penugasan dihapus')
     } catch (e) {
-      toast.error(`Failed: ${(e as Error).message}`)
+      toast.error(`Gagal: ${(e as Error).message}`)
     }
+  }
+
+  function onDeleteGroup() {
+    if (
+      !window.confirm(
+        `Hapus grup "${group.name}"?\n\nIni akan menghapus PERMANEN semua siswa, catatan absensi, penugasan OBS, dan permintaan pengganti yang terkait dengan grup ini. Tindakan ini tidak bisa dibatalkan.`,
+      )
+    )
+      return
+    deleteGroup.mutate(group.id, {
+      onSuccess: () => toast.success('Grup dihapus'),
+      onError: (e) => toast.error(`Gagal: ${(e as Error).message}`),
+    })
   }
 
   // 临时标记本周「原负责志愿者到没到」(再点一次取消);不计入任何数据,每周三自动清空
   function toggleMark(next: CheckStatus) {
     setMark.mutate(
       { groupId: group.id, status: checkStatus === next ? null : next },
-      { onError: (e) => toast.error(`Failed: ${(e as Error).message}`) },
+      { onError: (e) => toast.error(`Gagal: ${(e as Error).message}`) },
     )
   }
 
@@ -79,17 +93,29 @@ export function GroupAssignmentCard({
       <CardHeader>
         <CardTitle className="flex items-center justify-between gap-2 text-base">
           <span>{group.name}</span>
-          {group.cohort?.name && (
-            <Badge variant="outline" className="shrink-0 font-normal">
-              {group.cohort.name}
-            </Badge>
-          )}
+          <div className="flex shrink-0 items-center gap-1.5">
+            {group.cohort?.name && (
+              <Badge variant="outline" className="font-normal">
+                {group.cohort.name}
+              </Badge>
+            )}
+            <button
+              type="button"
+              onClick={onDeleteGroup}
+              disabled={deleteGroup.isPending}
+              className="text-muted-foreground hover:text-destructive rounded-sm"
+              title="Hapus grup"
+              aria-label={`Hapus grup ${group.name}`}
+            >
+              <Trash2 className="size-3.5" />
+            </button>
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         <div className="flex flex-wrap gap-2">
           {groupAssignments.length === 0 ? (
-            <span className="text-muted-foreground text-sm">No OBS assigned</span>
+            <span className="text-muted-foreground text-sm">Belum ada OBS</span>
           ) : (
             groupAssignments.map((a) => {
               // 三种来源:补位(coverage_week 非空)→ 浅绿;管理员手动指派(source=manual)→ 深蓝;
@@ -110,10 +136,10 @@ export function GroupAssignmentCard({
                   className={`gap-1 pr-1${tint}`}
                   title={
                     isCoverage
-                      ? `Covering (week of ${a.coverage_week})`
+                      ? `Menggantikan (minggu dari ${a.coverage_week})`
                       : isManual
-                        ? 'Assigned by an admin'
-                        : 'From the roster'
+                        ? 'Ditugaskan oleh admin'
+                        : 'Dari daftar awal'
                   }
                 >
                   {nameOf(a.volunteer_id)}
@@ -122,7 +148,7 @@ export function GroupAssignmentCard({
                     type="button"
                     onClick={() => void onRemove(a)}
                     className="hover:text-destructive rounded-sm"
-                    aria-label={`Remove ${nameOf(a.volunteer_id)}`}
+                    aria-label={`Hapus ${nameOf(a.volunteer_id)}`}
                   >
                     <X className="size-3" />
                   </button>
@@ -135,7 +161,7 @@ export function GroupAssignmentCard({
           <div className="flex items-center gap-2">
             <Select value={selected} onValueChange={setSelected}>
               <SelectTrigger className="w-[220px]">
-                <SelectValue placeholder="Choose someone" />
+                <SelectValue placeholder="Pilih seseorang" />
               </SelectTrigger>
               <SelectContent>
                 {available.map((v) => (
@@ -146,15 +172,15 @@ export function GroupAssignmentCard({
               </SelectContent>
             </Select>
             <Button onClick={() => void onAssign()} disabled={!selected || assign.isPending}>
-              Assign
+              Tugaskan
             </Button>
           </div>
         ) : (
-          <span className="text-muted-foreground text-sm">All OBS assigned</span>
+          <span className="text-muted-foreground text-sm">Semua OBS sudah ditugaskan</span>
         )}
 
         <div className="flex flex-wrap items-center gap-2 border-t pt-3">
-          <span className="text-muted-foreground text-xs">This week — original showed up?</span>
+          <span className="text-muted-foreground text-xs">Minggu ini — OBS asli hadir?</span>
           <Button
             size="sm"
             variant="outline"
@@ -164,7 +190,7 @@ export function GroupAssignmentCard({
             disabled={setMark.isPending}
             onClick={() => toggleMark('present')}
           >
-            Present
+            Hadir
           </Button>
           <Button
             size="sm"
@@ -175,7 +201,7 @@ export function GroupAssignmentCard({
             disabled={setMark.isPending}
             onClick={() => toggleMark('absent')}
           >
-            Absent
+            Tidak Hadir
           </Button>
         </div>
       </CardContent>

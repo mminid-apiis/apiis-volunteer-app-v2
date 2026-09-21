@@ -5,8 +5,8 @@ import { weekdayOffsetForClass } from '@/lib/calendar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-// 该周该班的实际上课日(周一班=周一,周二班=周一+1),如 "Tue 2026-07-14"
+const DOW = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']
+// 该周该班的实际上课日(周一班=周一,周二班=周一+1),如 "Sel 2026-07-14"
 function sessionDayLabel(weekMondayISO: string, className: string): string {
   const [y, m, d] = weekMondayISO.split('-').map(Number)
   const dt = new Date(Date.UTC(y, m - 1, d + weekdayOffsetForClass(className)))
@@ -19,8 +19,8 @@ export function CoverageNeeded() {
 
   function onClaim(id: string) {
     claim.mutate(id, {
-      onSuccess: () => toast.success('You are now covering this group'),
-      onError: (e) => toast.error(`Failed: ${(e as Error).message}`),
+      onSuccess: () => toast.success('Kamu sekarang menggantikan grup ini'),
+      onError: (e) => toast.error(`Gagal: ${(e as Error).message}`),
     })
   }
 
@@ -30,7 +30,7 @@ export function CoverageNeeded() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Coverage needed</CardTitle>
+        <CardTitle className="text-base">Butuh pengganti</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
         {requests.map((r) => {
@@ -43,14 +43,14 @@ export function CoverageNeeded() {
                   <span className="font-medium">{r.group_name}</span>
                   <span className="text-muted-foreground">
                     {' '}
-                    · {r.class_name} · week of {r.week_start_date}
+                    · {r.class_name} · minggu dari {r.week_start_date}
                   </span>
                 </div>
                 {deadline !== null && (
                   <span className="text-muted-foreground text-xs">
                     {closed
-                      ? `Claim closed (${formatDeadline(deadline)})`
-                      : `Claim by ${formatDeadline(deadline)}`}
+                      ? `Klaim ditutup (${formatDeadline(deadline)})`
+                      : `Klaim sebelum ${formatDeadline(deadline)}`}
                   </span>
                 )}
               </div>
@@ -60,14 +60,14 @@ export function CoverageNeeded() {
                 onClick={() => {
                   if (
                     !window.confirm(
-                      `Confirm you'll cover ${r.group_name} · ${r.class_name}, on ${sessionDayLabel(r.week_start_date, r.class_name)}?`,
+                      `Konfirmasi kamu akan menggantikan ${r.group_name} · ${r.class_name}, pada ${sessionDayLabel(r.week_start_date, r.class_name)}?`,
                     )
                   )
                     return
                   onClaim(r.id)
                 }}
               >
-                {closed ? 'Closed' : 'I will cover'}
+                {closed ? 'Ditutup' : 'Saya akan menggantikan'}
               </Button>
             </div>
           )

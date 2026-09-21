@@ -49,7 +49,7 @@ export function GroupAttendancePage() {
   if (groupQ.isError || !group) {
     return (
       <p className="text-muted-foreground text-sm">
-        Group not found, or you may not have access.
+        Grup tidak ditemukan, atau kamu tidak punya akses.
       </p>
     )
   }
@@ -63,7 +63,7 @@ export function GroupAttendancePage() {
           to="/"
           className="text-muted-foreground hover:text-foreground inline-flex w-fit items-center gap-1 text-sm"
         >
-          <ArrowLeft className="size-4" /> Back
+          <ArrowLeft className="size-4" /> Kembali
         </Link>
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">{group.name}</h1>
@@ -88,7 +88,7 @@ export function GroupAttendancePage() {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="session-week">Session week</Label>
+        <Label htmlFor="session-week">Minggu sesi</Label>
         {curriculum ? (
           <>
             <Select value={sessionDate} onValueChange={setPicked}>
@@ -108,8 +108,8 @@ export function GroupAttendancePage() {
             </Select>
             <p className="text-muted-foreground text-xs">
               {iAmSuper
-                ? 'Super admin: you can record any week.'
-                : 'You can record the current week only.'}
+                ? 'Super admin: kamu bisa mencatat minggu mana saja.'
+                : 'Kamu hanya bisa mencatat minggu berjalan.'}
             </p>
           </>
         ) : (
@@ -125,10 +125,10 @@ export function GroupAttendancePage() {
 
       {students.length === 0 ? (
         <p className="text-muted-foreground text-sm">
-          No students found for this group, or you may not have access.
+          Tidak ada siswa di grup ini, atau kamu tidak punya akses.
         </p>
       ) : attendanceQ.isLoading ? (
-        <p className="text-muted-foreground text-sm">Loading attendance…</p>
+        <p className="text-muted-foreground text-sm">Memuat absensi…</p>
       ) : (
         <AttendanceForm
           key={`${groupId}:${sessionDate}`}

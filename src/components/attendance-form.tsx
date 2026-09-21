@@ -45,32 +45,32 @@ const RUBRIC: {
   {
     score: 0,
     dot: 'bg-muted-foreground',
-    title: 'No Participation',
-    looksLike: 'Camera is off, absent, or completely silent, or missed one session.',
-    contribution: 'None.',
+    title: 'Tidak Berpartisipasi',
+    looksLike: 'Kamera mati, tidak hadir, atau sama sekali diam, atau tidak mengikuti satu sesi.',
+    contribution: 'Tidak ada.',
   },
   {
     score: 1,
     dot: 'bg-chart-4',
-    title: 'Minimal Participation',
-    looksLike: 'Camera is on, but mostly just watching.',
-    contribution: 'Repeating what others said, off-topic comments, or showing a lack of understanding.',
+    title: 'Partisipasi Minimal',
+    looksLike: 'Kamera menyala, tapi kebanyakan hanya menonton.',
+    contribution: 'Mengulang perkataan orang lain, komentar di luar topik, atau menunjukkan kurang paham.',
   },
   {
     score: 2,
     dot: 'bg-brand',
-    title: 'Satisfactory Participation',
-    looksLike: 'Camera is on, present, and prepared.',
+    title: 'Partisipasi Memuaskan',
+    looksLike: 'Kamera menyala, hadir, dan siap.',
     contribution:
-      'Answers the question correctly, but relies heavily on notes or readings without much personal thought.',
+      'Menjawab pertanyaan dengan benar, tapi sangat bergantung pada catatan/bacaan tanpa banyak pemikiran pribadi.',
   },
   {
     score: 3,
     dot: 'bg-brand-green',
-    title: 'Excellent Participation',
-    looksLike: 'Camera is on and highly engaged the whole time.',
+    title: 'Partisipasi Sangat Baik',
+    looksLike: 'Kamera menyala dan sangat terlibat sepanjang sesi.',
     contribution:
-      'Shares original ideas, connects the topic to real life or ministry, and helps move the group conversation forward.',
+      'Membagikan ide orisinal, mengaitkan topik dengan kehidupan nyata atau pelayanan, dan membantu mendorong diskusi kelompok maju.',
   },
 ]
 
@@ -119,7 +119,7 @@ export function AttendanceForm({ students, existing, groupId, sessionDate, volun
     } catch (e) {
       dirtyRef.current = true
       setStatus('error')
-      toast.error(`Couldn't save: ${(e as Error).message}`)
+      toast.error(`Gagal menyimpan: ${(e as Error).message}`)
     }
   }, [save, buildPayload])
 
@@ -145,7 +145,7 @@ export function AttendanceForm({ students, existing, groupId, sessionDate, volun
   return (
     <div className="flex flex-col gap-4">
       <div className="bg-muted/40 rounded-md border p-3 text-sm">
-        <p className="mb-2 font-medium">Contribution scoring guide</p>
+        <p className="mb-2 font-medium">Panduan penilaian Contribution</p>
         <ul className="flex flex-col gap-2.5">
           {RUBRIC.map((r) => (
             <li key={r.score}>
@@ -154,7 +154,7 @@ export function AttendanceForm({ students, existing, groupId, sessionDate, volun
                 {r.score} – {r.title}
               </p>
               <p className="text-muted-foreground">
-                <span className="text-foreground/80 font-medium">What it looks like:</span>{' '}
+                <span className="text-foreground/80 font-medium">Ciri-cirinya:</span>{' '}
                 {r.looksLike}
               </p>
               <p className="text-muted-foreground">
@@ -170,9 +170,9 @@ export function AttendanceForm({ students, existing, groupId, sessionDate, volun
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Student</TableHead>
+              <TableHead>Siswa</TableHead>
               <TableHead className="w-40">Contribution</TableHead>
-              <TableHead>Notes</TableHead>
+              <TableHead>Catatan</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -192,7 +192,7 @@ export function AttendanceForm({ students, existing, groupId, sessionDate, volun
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="none">— Not assessed</SelectItem>
+                        <SelectItem value="none">— Belum dinilai</SelectItem>
                         <SelectItem value="0">0</SelectItem>
                         <SelectItem value="1">1</SelectItem>
                         <SelectItem value="2">2</SelectItem>
@@ -204,9 +204,9 @@ export function AttendanceForm({ students, existing, groupId, sessionDate, volun
                     <Input
                       value={r.notes}
                       onChange={(e) => update(s.id, { notes: e.target.value })}
-                      placeholder="Optional"
+                      placeholder="Opsional"
                       maxLength={200}
-                      title="Max 200 characters"
+                      title="Maks 200 karakter"
                     />
                   </TableCell>
                 </TableRow>
@@ -218,14 +218,14 @@ export function AttendanceForm({ students, existing, groupId, sessionDate, volun
 
       <div className="flex items-center justify-end gap-3">
         <span className="text-xs">
-          {status === 'saving' && <span className="text-muted-foreground">Saving…</span>}
-          {status === 'saved' && <span className="text-muted-foreground">All changes saved ✓</span>}
+          {status === 'saving' && <span className="text-muted-foreground">Menyimpan…</span>}
+          {status === 'saved' && <span className="text-muted-foreground">Semua perubahan tersimpan ✓</span>}
           {status === 'error' && (
-            <span className="text-destructive">Couldn’t save — try “Save now”</span>
+            <span className="text-destructive">Gagal menyimpan — coba "Simpan sekarang"</span>
           )}
         </span>
         <Button variant="secondary" onClick={() => void persist()} disabled={save.isPending}>
-          {save.isPending ? 'Saving…' : 'Save now'}
+          {save.isPending ? 'Menyimpan…' : 'Simpan sekarang'}
         </Button>
       </div>
     </div>

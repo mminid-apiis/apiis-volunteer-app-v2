@@ -23,7 +23,7 @@ export function AdminRecordsPage() {
           </CardHeader>
           <CardContent>
             <Button asChild size="sm" variant="secondary">
-              <Link to={`/groups/${g.id}`}>Open attendance</Link>
+              <Link to={`/groups/${g.id}`}>Buka absensi</Link>
             </Button>
           </CardContent>
         </Card>

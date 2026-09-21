@@ -2,7 +2,7 @@ import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 /** 就地加载指示器（转圈 + 文字）。用于标签页/列表等区域内的加载状态。 */
-export function Spinner({ label = 'Loading…', className }: { label?: string; className?: string }) {
+export function Spinner({ label = 'Memuat…', className }: { label?: string; className?: string }) {
   return (
     <div
       className={cn(

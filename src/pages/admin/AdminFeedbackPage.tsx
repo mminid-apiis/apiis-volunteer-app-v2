@@ -16,7 +16,7 @@ export function AdminFeedbackPage() {
   const del = useDeleteFeedback()
   if (isLoading) return <Spinner />
   if (!items || items.length === 0)
-    return <p className="text-muted-foreground text-sm">No feedback yet.</p>
+    return <p className="text-muted-foreground text-sm">Belum ada masukan.</p>
 
   // 未解决在前,其次按时间(新 → 旧)
   const sorted = [...items].sort(
@@ -27,8 +27,8 @@ export function AdminFeedbackPage() {
     setResolved.mutate(
       { id: f.id, resolved: !f.resolved },
       {
-        onSuccess: () => toast.success(f.resolved ? 'Reopened' : 'Marked resolved'),
-        onError: (e) => toast.error(`Failed: ${(e as Error).message}`),
+        onSuccess: () => toast.success(f.resolved ? 'Dibuka kembali' : 'Ditandai selesai'),
+        onError: (e) => toast.error(`Gagal: ${(e as Error).message}`),
       },
     )
   }
@@ -36,13 +36,13 @@ export function AdminFeedbackPage() {
   function onDelete(f: Feedback) {
     if (
       !window.confirm(
-        `Delete this feedback from ${f.full_name || 'Unknown'}? This permanently removes it.`,
+        `Hapus masukan dari ${f.full_name || 'Tidak diketahui'}? Ini menghapusnya secara permanen.`,
       )
     )
       return
     del.mutate(f.id, {
-      onSuccess: () => toast.success('Feedback deleted'),
-      onError: (e) => toast.error(`Failed: ${(e as Error).message}`),
+      onSuccess: () => toast.success('Masukan dihapus'),
+      onError: (e) => toast.error(`Gagal: ${(e as Error).message}`),
     })
   }
 
@@ -52,14 +52,14 @@ export function AdminFeedbackPage() {
         <div key={f.id} className={`rounded-md border p-3 ${f.resolved ? 'bg-muted/40' : ''}`}>
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <p className="font-medium">{f.full_name || 'Unknown'}</p>
+              <p className="font-medium">{f.full_name || 'Tidak diketahui'}</p>
               {f.resolved && (
                 <Badge
                   variant="secondary"
                   className="gap-1 font-normal"
-                  title={f.resolved_at ? `Resolved ${new Date(f.resolved_at).toLocaleString()}` : undefined}
+                  title={f.resolved_at ? `Selesai ${new Date(f.resolved_at).toLocaleString()}` : undefined}
                 >
-                  <Check className="size-3" /> Resolved
+                  <Check className="size-3" /> Selesai
                 </Badge>
               )}
             </div>
@@ -75,7 +75,7 @@ export function AdminFeedbackPage() {
               disabled={setResolved.isPending}
               onClick={() => toggle(f)}
             >
-              {f.resolved ? 'Reopen' : 'Mark resolved'}
+              {f.resolved ? 'Buka kembali' : 'Tandai selesai'}
             </Button>
             <Button
               size="sm"
@@ -84,7 +84,7 @@ export function AdminFeedbackPage() {
               disabled={del.isPending}
               onClick={() => onDelete(f)}
             >
-              <Trash2 className="size-3.5" /> Delete
+              <Trash2 className="size-3.5" /> Hapus
             </Button>
           </div>
         </div>

@@ -122,3 +122,37 @@ export function useDeleteStudent() {
     },
   })
 }
+
+/** 新增小组（管理员；RLS 允许）：组名按该班级现有小组自动编号为 "Group N+1"。 */
+export function useAddGroup() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (vars: { cohortId: string; existingNames: string[]; meetingDay: string | null }) => {
+      const nums = vars.existingNames
+        .map((n) => Number(n.match(/\d+/)?.[0]))
+        .filter((n) => !Number.isNaN(n))
+      const next = (nums.length ? Math.max(...nums) : 0) + 1
+      const { error } = await supabase
+        .from('groups')
+        .insert({ cohort_id: vars.cohortId, name: `Group ${next}`, meeting_day: vars.meetingDay })
+      if (error) throw error
+    },
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ['all-groups'] }),
+  })
+}
+
+/** 删除小组（管理员；RLS 允许）。级联删除其学员、出勤记录、分配、补位请求——调用前必须先向管理员确认。 */
+export function useDeleteGroup() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('groups').delete().eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['all-groups'] })
+      void qc.invalidateQueries({ queryKey: ['assignments'] })
+      void qc.invalidateQueries({ queryKey: ['students'] })
+    },
+  })
+}

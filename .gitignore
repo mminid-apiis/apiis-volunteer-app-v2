@@ -27,3 +27,5 @@ dist-ssr
 /APIIS Brand Guidelines.pdf
 /APIIS Logo.png
 /Curriculum & Calendar19062026.xlsx
+.vercel
+.env*

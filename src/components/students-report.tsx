@@ -9,6 +9,7 @@ import type { ReportCell } from '@/lib/report'
 import { curriculumForClass, translateClassName, weekForDate } from '@/lib/calendar'
 import { ImportStudents } from '@/components/import-admin'
 import { Spinner } from '@/components/spinner'
+import { SortableTableHead, toggleSort, type SortState } from '@/components/sortable-table-head'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -27,10 +28,35 @@ interface WeekColumn {
   sort: number
 }
 
+type StudentSortKey = 'name' | 'email' | 'class' | 'group'
+
+function compareStudents(
+  a: { full_name: string; email: string; class_name: string; group_name: string },
+  b: { full_name: string; email: string; class_name: string; group_name: string },
+  sort: SortState<StudentSortKey>,
+): number {
+  const dir = sort.dir === 'asc' ? 1 : -1
+  switch (sort.key) {
+    case 'email':
+      return dir * a.email.localeCompare(b.email, undefined, { sensitivity: 'base' })
+    case 'class':
+      return (
+        dir * a.class_name.localeCompare(b.class_name, undefined, { sensitivity: 'base' }) ||
+        a.group_name.localeCompare(b.group_name, undefined, { numeric: true })
+      )
+    case 'group':
+      return dir * a.group_name.localeCompare(b.group_name, undefined, { numeric: true })
+    case 'name':
+    default:
+      return dir * a.full_name.localeCompare(b.full_name, undefined, { sensitivity: 'base', numeric: true })
+  }
+}
+
 export function StudentsReport({ classFilter }: { classFilter: string }) {
   const [exporting, setExporting] = useState(false)
   const [showImport, setShowImport] = useState(false)
   const [query, setQuery] = useState('')
+  const [sort, setSort] = useState<SortState<StudentSortKey>>({ key: 'name', dir: 'asc' })
   const isAll = classFilter === 'all'
   const reportQ = useAttendanceReport(isAll ? undefined : classFilter)
   const del = useDeleteStudent()
@@ -38,7 +64,7 @@ export function StudentsReport({ classFilter }: { classFilter: string }) {
   const { profile } = useAuth()
   const iAmSuper = profile?.role === 'super_admin'
 
-  // 搜索(姓名/邮箱/班级/组)+ 按姓名 a→z
+  // 搜索(姓名/邮箱/班级/组)+ 按选定的列排序(点表头切换)
   const visibleStudents = useMemo(() => {
     const list = report?.students ?? []
     const q = query.trim().toLowerCase()
@@ -51,10 +77,8 @@ export function StudentsReport({ classFilter }: { classFilter: string }) {
             s.group_name.toLowerCase().includes(q),
         )
       : list
-    return [...filtered].sort((a, b) =>
-      a.full_name.localeCompare(b.full_name, undefined, { sensitivity: 'base', numeric: true }),
-    )
-  }, [report, query])
+    return [...filtered].sort((a, b) => compareStudents(a, b, sort))
+  }, [report, query, sort])
 
   // 把每条记录的日期映射成「周次」(按学生所属课程)，只保留有数据的周列
   const { columns, cellByStudent } = useMemo(() => {
@@ -155,10 +179,34 @@ export function StudentsReport({ classFilter }: { classFilter: string }) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="bg-background sticky left-0 whitespace-nowrap">Siswa</TableHead>
-                <TableHead className="whitespace-nowrap">Email</TableHead>
-                <TableHead className="whitespace-nowrap">Kelas</TableHead>
-                <TableHead className="whitespace-nowrap">Grup</TableHead>
+                <SortableTableHead
+                  label="Siswa"
+                  sortKey="name"
+                  sort={sort}
+                  onSort={(k) => setSort((s) => toggleSort(s, k))}
+                  className="bg-background sticky left-0 whitespace-nowrap"
+                />
+                <SortableTableHead
+                  label="Email"
+                  sortKey="email"
+                  sort={sort}
+                  onSort={(k) => setSort((s) => toggleSort(s, k))}
+                  className="whitespace-nowrap"
+                />
+                <SortableTableHead
+                  label="Kelas"
+                  sortKey="class"
+                  sort={sort}
+                  onSort={(k) => setSort((s) => toggleSort(s, k))}
+                  className="whitespace-nowrap"
+                />
+                <SortableTableHead
+                  label="Grup"
+                  sortKey="group"
+                  sort={sort}
+                  onSort={(k) => setSort((s) => toggleSort(s, k))}
+                  className="whitespace-nowrap"
+                />
                 {columns.map((c) => (
                   <TableHead key={c.key} className="text-center whitespace-nowrap" title={c.title}>
                     {c.label}

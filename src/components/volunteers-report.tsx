@@ -14,6 +14,7 @@ import { useAllGroups } from '@/hooks/use-groups'
 import { translateClassName } from '@/lib/calendar'
 import { ImportVolunteers } from '@/components/import-admin'
 import { Spinner } from '@/components/spinner'
+import { SortableTableHead, toggleSort, type SortState } from '@/components/sortable-table-head'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -31,6 +32,52 @@ function roleRank(r: string): number {
   return r === 'super_admin' ? 0 : r === 'admin' ? 1 : 2
 }
 
+type VolunteerSortKey = 'name' | 'email' | 'role' | 'group' | 'sessions' | 'lastActive' | 'coverage'
+
+function compareVolunteers(
+  a: {
+    volunteer_id: string
+    full_name: string
+    email: string | null
+    role: string
+    sessions_recorded: number
+    last_active: string | null
+    coverage_count: number
+  },
+  b: typeof a,
+  sort: SortState<VolunteerSortKey>,
+  firstGroupLabel: Map<string, string>,
+): number {
+  const dir = sort.dir === 'asc' ? 1 : -1
+  switch (sort.key) {
+    case 'email':
+      return dir * (a.email ?? '').localeCompare(b.email ?? '', undefined, { sensitivity: 'base' })
+    case 'group':
+      return (
+        dir *
+        (firstGroupLabel.get(a.volunteer_id) ?? '').localeCompare(
+          firstGroupLabel.get(b.volunteer_id) ?? '',
+          undefined,
+          { numeric: true },
+        )
+      )
+    case 'sessions':
+      return dir * (a.sessions_recorded - b.sessions_recorded)
+    case 'lastActive':
+      return dir * (a.last_active ?? '').localeCompare(b.last_active ?? '')
+    case 'coverage':
+      return dir * (a.coverage_count - b.coverage_count)
+    case 'role':
+      return (
+        dir * (roleRank(a.role) - roleRank(b.role)) ||
+        a.full_name.localeCompare(b.full_name, undefined, { sensitivity: 'base', numeric: true })
+      )
+    case 'name':
+    default:
+      return dir * a.full_name.localeCompare(b.full_name, undefined, { sensitivity: 'base', numeric: true })
+  }
+}
+
 export function VolunteersReport({ classFilter }: { classFilter: string }) {
   const { user, profile } = useAuth()
   const iAmSuper = profile?.role === 'super_admin'
@@ -43,33 +90,7 @@ export function VolunteersReport({ classFilter }: { classFilter: string }) {
   const [query, setQuery] = useState('')
   const [showImport, setShowImport] = useState(false)
   const [exporting, setExporting] = useState(false)
-
-  // 按班级筛选 → 搜索 → 角色置顶(super/admin)再按姓名 a→z
-  const rows = useMemo(() => {
-    const all = data ?? []
-    let list = all
-    if (classFilter !== 'all') {
-      const groupIdsInClass = new Set(
-        (groupsQ.data ?? []).filter((g) => g.cohort_id === classFilter).map((g) => g.id),
-      )
-      const ids = new Set(
-        (assignmentsQ.data ?? [])
-          .filter((a) => groupIdsInClass.has(a.group_id))
-          .map((a) => a.volunteer_id),
-      )
-      list = all.filter((v) => ids.has(v.volunteer_id))
-    }
-    const q = query.trim().toLowerCase()
-    if (q)
-      list = list.filter(
-        (v) => v.full_name.toLowerCase().includes(q) || (v.email || '').toLowerCase().includes(q),
-      )
-    return [...list].sort(
-      (a, b) =>
-        roleRank(a.role) - roleRank(b.role) ||
-        a.full_name.localeCompare(b.full_name, undefined, { sensitivity: 'base', numeric: true }),
-    )
-  }, [data, assignmentsQ.data, groupsQ.data, classFilter, query])
+  const [sort, setSort] = useState<SortState<VolunteerSortKey>>({ key: 'role', dir: 'asc' })
 
   // 每个志愿者的具体组名(客户端用 assignments + groups 拼出),带简短班级码,如 "6P · Group 1"
   const groupsByVolunteer = useMemo(() => {
@@ -92,6 +113,35 @@ export function VolunteersReport({ classFilter }: { classFilter: string }) {
       arr.sort((x, y) => x.label.localeCompare(y.label, undefined, { numeric: true }))
     return map
   }, [assignmentsQ.data, groupsQ.data])
+
+  const firstGroupLabel = useMemo(() => {
+    const map = new Map<string, string>()
+    for (const [id, arr] of groupsByVolunteer) map.set(id, arr[0]?.label ?? '')
+    return map
+  }, [groupsByVolunteer])
+
+  // 按班级筛选 → 搜索 → 按选定的列排序(点表头切换；默认角色置顶(super/admin)再按姓名 a→z)
+  const rows = useMemo(() => {
+    const all = data ?? []
+    let list = all
+    if (classFilter !== 'all') {
+      const groupIdsInClass = new Set(
+        (groupsQ.data ?? []).filter((g) => g.cohort_id === classFilter).map((g) => g.id),
+      )
+      const ids = new Set(
+        (assignmentsQ.data ?? [])
+          .filter((a) => groupIdsInClass.has(a.group_id))
+          .map((a) => a.volunteer_id),
+      )
+      list = all.filter((v) => ids.has(v.volunteer_id))
+    }
+    const q = query.trim().toLowerCase()
+    if (q)
+      list = list.filter(
+        (v) => v.full_name.toLowerCase().includes(q) || (v.email || '').toLowerCase().includes(q),
+      )
+    return [...list].sort((a, b) => compareVolunteers(a, b, sort, firstGroupLabel))
+  }, [data, assignmentsQ.data, groupsQ.data, classFilter, query, sort, firstGroupLabel])
 
   async function onExport() {
     setExporting(true)
@@ -188,13 +238,39 @@ export function VolunteersReport({ classFilter }: { classFilter: string }) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nama</TableHead>
-                <TableHead className="whitespace-nowrap">Email</TableHead>
-                <TableHead>Peran</TableHead>
-                <TableHead>Grup ditugaskan</TableHead>
-                <TableHead className="text-center">Sesi dihadiri</TableHead>
-                <TableHead className="whitespace-nowrap">Terakhir aktif</TableHead>
-                <TableHead className="text-center">Pengganti diberikan</TableHead>
+                <SortableTableHead label="Nama" sortKey="name" sort={sort} onSort={(k) => setSort((s) => toggleSort(s, k))} />
+                <SortableTableHead
+                  label="Email"
+                  sortKey="email"
+                  sort={sort}
+                  onSort={(k) => setSort((s) => toggleSort(s, k))}
+                  className="whitespace-nowrap"
+                />
+                <SortableTableHead label="Peran" sortKey="role" sort={sort} onSort={(k) => setSort((s) => toggleSort(s, k))} />
+                <SortableTableHead label="Grup ditugaskan" sortKey="group" sort={sort} onSort={(k) => setSort((s) => toggleSort(s, k))} />
+                <SortableTableHead
+                  label="Sesi dihadiri"
+                  sortKey="sessions"
+                  sort={sort}
+                  onSort={(k) => setSort((s) => toggleSort(s, k))}
+                  className="text-center"
+                  align="center"
+                />
+                <SortableTableHead
+                  label="Terakhir aktif"
+                  sortKey="lastActive"
+                  sort={sort}
+                  onSort={(k) => setSort((s) => toggleSort(s, k))}
+                  className="whitespace-nowrap"
+                />
+                <SortableTableHead
+                  label="Pengganti diberikan"
+                  sortKey="coverage"
+                  sort={sort}
+                  onSort={(k) => setSort((s) => toggleSort(s, k))}
+                  className="text-center"
+                  align="center"
+                />
                 <TableHead className="text-center">Aksi</TableHead>
               </TableRow>
             </TableHeader>
@@ -293,7 +369,7 @@ export function VolunteersReport({ classFilter }: { classFilter: string }) {
       )}
 
       <p className="text-muted-foreground text-xs">
-        Admin ditampilkan lebih dulu, lalu A–Z berdasarkan nama. Hanya <b>super admin</b> yang bisa
+        Klik judul kolom untuk mengurutkan (klik lagi untuk membalik arah). Hanya <b>super admin</b> yang bisa
         impor, promosi/turunkan, atau hapus pengguna — admin mengelola penugasan, absensi &amp;
         laporan; OBS mencatat absensi. Kamu tidak bisa bertindak pada barismu sendiri atau super admin.
       </p>

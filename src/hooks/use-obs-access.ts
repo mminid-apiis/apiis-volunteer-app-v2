@@ -127,6 +127,20 @@ export function useObsSaveAttendance() {
   })
 }
 
+/** 提交反馈(免登录模式;走 SECURITY DEFINER 绕过 feedback 表的 auth.uid() RLS)。 */
+export function useObsSubmitFeedback() {
+  return useMutation({
+    mutationFn: async (vars: { code: string; volunteerId: string; message: string }) => {
+      const { error } = await supabase.rpc('obs_submit_feedback', {
+        p_code: vars.code,
+        p_volunteer_id: vars.volunteerId,
+        p_message: vars.message,
+      })
+      if (error) throw error
+    },
+  })
+}
+
 /** 管理员:OBS 免登录模式的访问日志(RLS 已限制仅 admin 可读)。 */
 export function useObsAccessLog() {
   return useQuery({

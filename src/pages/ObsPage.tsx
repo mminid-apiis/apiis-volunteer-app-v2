@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
+import type { FormEvent } from 'react'
 import { Link } from 'react-router-dom'
+import { MessageSquareHeart } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   useObsAttendance,
   useObsGroups,
   useObsGroupStudents,
   useObsSaveAttendance,
+  useObsSubmitFeedback,
   useObsVerify,
   useObsVolunteers,
 } from '@/hooks/use-obs-access'
@@ -24,6 +27,7 @@ import { Spinner } from '@/components/spinner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import {
   Select,
@@ -371,12 +375,97 @@ function ObsAttendance({
   )
 }
 
+/** Tombol mengambang untuk membuka form tanggapan — sengaja beda warna (amber) dari tema biru
+ * halaman OBS supaya gampang ditemukan, muncul di semua langkah setelah verifikasi berhasil. */
+function ObsFeedbackFab({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="fixed right-4 bottom-4 z-40 flex items-center gap-2 rounded-full bg-amber-500 px-4 py-3 text-sm font-medium text-white shadow-lg transition hover:scale-105 hover:bg-amber-600"
+    >
+      <MessageSquareHeart className="size-4" /> Tanggapan
+    </button>
+  )
+}
+
+/** Form tanggapan — sama seperti /feedback untuk OBS yang login, tapi lewat obs_submit_feedback
+ * (SECURITY DEFINER) karena sesi /obs tidak punya auth.uid() untuk memenuhi RLS tabel feedback. */
+function ObsFeedback({
+  code,
+  volunteerId,
+  onClose,
+}: {
+  code: string
+  volunteerId: string
+  onClose: () => void
+}) {
+  const [message, setMessage] = useState('')
+  const submit = useObsSubmitFeedback()
+
+  async function onSubmit(e: FormEvent) {
+    e.preventDefault()
+    const text = message.trim()
+    if (!text) return
+    try {
+      await submit.mutateAsync({ code, volunteerId, message: text })
+      toast.success('Terima kasih! Tanggapan kamu sudah terkirim.')
+      onClose()
+    } catch (err) {
+      toast.error(`Gagal: ${(err as Error).message}`)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <Card className="w-full max-w-md border-2 border-amber-400 shadow-xl">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-amber-600">
+            <MessageSquareHeart className="size-5" /> Tanggapan untuk aplikasi ini
+          </CardTitle>
+          <CardDescription>
+            Ceritakan pengalamanmu pakai mode tanpa login ini — kendala, ide perbaikan, apa saja.
+            Admin akan membacanya.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={(e) => void onSubmit(e)} className="flex flex-col gap-4">
+            <Textarea
+              rows={5}
+              required
+              maxLength={500}
+              autoFocus
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Apa yang berjalan baik, apa yang belum, ide untuk perbaikan…"
+            />
+            <p className="text-muted-foreground text-right text-xs">{message.length}/500</p>
+            <div className="flex justify-end gap-2">
+              <Button type="button" variant="outline" onClick={onClose}>
+                Tutup
+              </Button>
+              <Button
+                type="submit"
+                disabled={submit.isPending || !message.trim()}
+                className="bg-amber-500 text-white hover:bg-amber-600"
+              >
+                {submit.isPending ? 'Mengirim…' : 'Kirim tanggapan'}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
 export function ObsPage() {
   const [code, setCode] = useState<string | null>(() => readLS(LS_CODE))
   const [volunteerId, setVolunteerId] = useState<string | null>(() => readLS(LS_VOLUNTEER_ID))
   const [fullName, setFullName] = useState<string | null>(() => readLS(LS_FULL_NAME))
   const [checking, setChecking] = useState(!!code && !!volunteerId)
   const [group, setGroup] = useState<{ id: string; className: string; groupName: string } | null>(null)
+  const [showFeedback, setShowFeedback] = useState(false)
   const verify = useObsVerify()
 
   // 已有缓存身份时,进 /obs 自动重新校验一次(顺便留一条"进入"日志,记录这次访问的时间/设备)。
@@ -427,25 +516,29 @@ export function ObsPage() {
     return <ObsGate onVerified={onVerified} />
   }
 
-  if (!group) {
-    return (
-      <ObsGroupPicker
-        code={code}
-        fullName={fullName}
-        onSwitchName={onSwitchName}
-        onPick={(groupId, className, groupName) => setGroup({ id: groupId, className, groupName })}
-      />
-    )
-  }
-
   return (
-    <ObsAttendance
-      code={code}
-      volunteerId={volunteerId}
-      className={group.className}
-      groupName={group.groupName}
-      groupId={group.id}
-      onSwitchGroup={() => setGroup(null)}
-    />
+    <>
+      {!group ? (
+        <ObsGroupPicker
+          code={code}
+          fullName={fullName}
+          onSwitchName={onSwitchName}
+          onPick={(groupId, className, groupName) => setGroup({ id: groupId, className, groupName })}
+        />
+      ) : (
+        <ObsAttendance
+          code={code}
+          volunteerId={volunteerId}
+          className={group.className}
+          groupName={group.groupName}
+          groupId={group.id}
+          onSwitchGroup={() => setGroup(null)}
+        />
+      )}
+      <ObsFeedbackFab onClick={() => setShowFeedback(true)} />
+      {showFeedback && (
+        <ObsFeedback code={code} volunteerId={volunteerId} onClose={() => setShowFeedback(false)} />
+      )}
+    </>
   )
 }

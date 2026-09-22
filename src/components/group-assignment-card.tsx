@@ -8,6 +8,7 @@ import {
   type CheckStatus,
 } from '@/hooks/use-assignments'
 import { useDeleteGroup, type GroupWithCohort } from '@/hooks/use-groups'
+import { translateClassName } from '@/lib/calendar'
 import type { Assignment, Profile } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -96,7 +97,7 @@ export function GroupAssignmentCard({
           <div className="flex shrink-0 items-center gap-1.5">
             {group.cohort?.name && (
               <Badge variant="outline" className="font-normal">
-                {group.cohort.name}
+                {translateClassName(group.cohort.name)}
               </Badge>
             )}
             <button

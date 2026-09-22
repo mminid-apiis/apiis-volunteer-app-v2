@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase'
-import { curriculumForClass, weekForDate } from '@/lib/calendar'
+import { curriculumForClass, translateClassName, weekForDate } from '@/lib/calendar'
 import { roleLabel } from '@/lib/auth'
 
 export interface ReportStudent {
@@ -170,7 +170,7 @@ export async function exportStudentMatrix(opts: { classId?: string; fileName?: s
   }
   const aoa: (string | number)[][] = [top, sub]
   for (const s of students) {
-    const row: (string | number)[] = [s.class_name, s.group_name, s.full_name, s.email]
+    const row: (string | number)[] = [translateClassName(s.class_name), s.group_name, s.full_name, s.email]
     for (const c of cols) {
       const cell = cellByStudent[s.id]?.[c.key]
       row.push(cell && cell.score !== null ? cell.score : '', cell?.note ?? '')

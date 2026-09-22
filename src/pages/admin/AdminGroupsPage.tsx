@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 import { useAddGroup, useAllGroups, useClasses } from '@/hooks/use-groups'
 import { useAssignments, useAllUsers, useGroupCheckMarks } from '@/hooks/use-assignments'
 import { useClassFilter } from '@/hooks/use-class-filter'
+import { translateClassName } from '@/lib/calendar'
 import { GroupAssignmentCard } from '@/components/group-assignment-card'
 import { Spinner } from '@/components/spinner'
 
@@ -87,7 +88,7 @@ export function AdminGroupsPage() {
         const groups = allGroups.filter((g) => g.cohort_id === c.id)
         return (
           <div key={c.id} className="flex flex-col gap-3">
-            <h2 className="text-lg font-semibold tracking-tight">{c.name}</h2>
+            <h2 className="text-lg font-semibold tracking-tight">{translateClassName(c.name)}</h2>
             <div className="grid gap-4 md:grid-cols-2">
               {groups.map((g) => (
                 <GroupAssignmentCard

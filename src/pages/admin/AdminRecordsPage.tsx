@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useAllGroups } from '@/hooks/use-groups'
 import { useClassFilter } from '@/hooks/use-class-filter'
+import { translateClassName } from '@/lib/calendar'
 import { Spinner } from '@/components/spinner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -19,7 +20,9 @@ export function AdminRecordsPage() {
         <Card key={g.id}>
           <CardHeader>
             <CardTitle className="text-base">{g.name}</CardTitle>
-            {g.cohort?.name && <p className="text-muted-foreground text-xs">{g.cohort.name}</p>}
+            {g.cohort?.name && (
+              <p className="text-muted-foreground text-xs">{translateClassName(g.cohort.name)}</p>
+            )}
           </CardHeader>
           <CardContent>
             <Button asChild size="sm" variant="secondary">

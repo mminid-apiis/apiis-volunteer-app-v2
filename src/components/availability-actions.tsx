@@ -2,6 +2,7 @@ import { toast } from 'sonner'
 import { useMyAvailability, useSetAvailability } from '@/hooks/use-scheduling'
 import { useMyGroups } from '@/hooks/use-groups'
 import { availabilityDeadline, formatDeadline, isPast } from '@/lib/deadlines'
+import { translateClassName } from '@/lib/calendar'
 import { Button } from '@/components/ui/button'
 
 /** 可用性回复（通知里的 weekly_check）：按志愿者负责的「每个组」逐组 Yes / No。 */
@@ -34,7 +35,7 @@ export function AvailabilityActions({ volunteerId, week }: { volunteerId: string
         return (
           <div key={g.id} className="flex flex-wrap items-center gap-2">
             <span className="text-sm font-medium">{g.name}</span>
-            <span className="text-muted-foreground text-xs">{g.class_name}</span>
+            <span className="text-muted-foreground text-xs">{translateClassName(g.class_name)}</span>
             <Button
               variant={cur === true ? 'default' : 'outline'}
               size="sm"

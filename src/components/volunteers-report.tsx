@@ -11,6 +11,7 @@ import {
   useVolunteerActivity,
 } from '@/hooks/use-assignments'
 import { useAllGroups } from '@/hooks/use-groups'
+import { translateClassName } from '@/lib/calendar'
 import { ImportVolunteers } from '@/components/import-admin'
 import { Spinner } from '@/components/spinner'
 import { Badge } from '@/components/ui/badge'
@@ -83,7 +84,7 @@ export function VolunteersReport({ classFilter }: { classFilter: string }) {
       arr.push({
         id: a.id,
         label: short ? `${short} · ${g.name}` : g.name,
-        title: cls ? `${cls} · ${g.name}` : g.name,
+        title: cls ? `${translateClassName(cls)} · ${g.name}` : g.name,
       })
       map.set(a.volunteer_id, arr)
     }

@@ -13,6 +13,7 @@ import {
   curriculumForClass,
   currentWeek,
   sessionDateForWeek,
+  translateClassName,
   weekLabel,
   weeksForCurriculum,
 } from '@/lib/calendar'
@@ -180,7 +181,10 @@ function ObsGroupPicker({
     for (const g of groupsQ.data ?? []) map.set(g.cohort_id, g.cohort_name)
     return [...map.entries()]
   }, [groupsQ.data])
-  const groupsInClass = groups.filter((g) => g.cohort_id === cohortId)
+  // Urutkan numerik (Group 1, 2, … 17) — bukan abjad (Group 1, 10, 11, …).
+  const groupsInClass = groups
+    .filter((g) => g.cohort_id === cohortId)
+    .sort((a, b) => a.group_name.localeCompare(b.group_name, undefined, { numeric: true }))
 
   return (
     <div className="mx-auto flex min-h-svh w-full max-w-md flex-col justify-center gap-4 p-4">
@@ -217,7 +221,7 @@ function ObsGroupPicker({
                   <SelectContent>
                     {classes.map(([id, name]) => (
                       <SelectItem key={id} value={id}>
-                        {name}
+                        {translateClassName(name)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -298,7 +302,7 @@ function ObsAttendance({
         </button>
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">{groupName}</h1>
-          <p className="text-muted-foreground mt-1 text-sm">{className}</p>
+          <p className="text-muted-foreground mt-1 text-sm">{translateClassName(className)}</p>
         </div>
       </div>
 

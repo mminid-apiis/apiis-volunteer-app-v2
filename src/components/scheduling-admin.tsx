@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { RefreshCw, TriangleAlert } from 'lucide-react'
 import { toast } from 'sonner'
 import { nextWeekMonday } from '@/lib/date'
+import { translateClassName } from '@/lib/calendar'
 import {
   useAppSettings,
   useIsSessionWeek,
@@ -249,7 +250,7 @@ export function SchedulingAdmin() {
                     >
                       <span>
                         <span className="font-medium">{c.group_name}</span>
-                        <span className="text-muted-foreground"> · {c.class_name}</span>
+                        <span className="text-muted-foreground"> · {translateClassName(c.class_name)}</span>
                       </span>
                       {c.status === 'open' ? (
                         <Badge variant="outline">Terbuka</Badge>
@@ -263,7 +264,7 @@ export function SchedulingAdmin() {
                             onClick={() => {
                               if (
                                 !window.confirm(
-                                  `Buka lagi pengganti untuk ${c.group_name} (${c.class_name})? Ini melepas ${c.coverer ?? 'orang yang menggantikan'} supaya bisa diklaim orang lain.`,
+                                  `Buka lagi pengganti untuk ${c.group_name} (${translateClassName(c.class_name)})? Ini melepas ${c.coverer ?? 'orang yang menggantikan'} supaya bisa diklaim orang lain.`,
                                 )
                               )
                                 return

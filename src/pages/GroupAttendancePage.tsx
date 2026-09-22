@@ -8,6 +8,7 @@ import {
   curriculumForClass,
   currentWeek,
   sessionDateForWeek,
+  translateClassName,
   weekLabel,
   weeksForCurriculum,
 } from '@/lib/calendar'
@@ -69,8 +70,8 @@ export function GroupAttendancePage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">{group.name}</h1>
           <p className="text-muted-foreground mt-1 flex flex-wrap items-center gap-1 text-sm">
-            <span>{group.cohort?.name}</span>
-            {group.meeting_day && <span>· {group.meeting_day}</span>}
+            <span>{translateClassName(group.cohort?.name)}</span>
+            {group.meeting_day && <span>· {translateClassName(group.meeting_day)}</span>}
             {group.zoom_link && (
               <>
                 <span>·</span>

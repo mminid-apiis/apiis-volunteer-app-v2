@@ -1,7 +1,7 @@
 import { toast } from 'sonner'
 import { useClaimCoverage, useOpenCoverageRequests } from '@/hooks/use-scheduling'
 import { coverageDeadline, formatDeadline, isPast } from '@/lib/deadlines'
-import { weekdayOffsetForClass } from '@/lib/calendar'
+import { translateClassName, weekdayOffsetForClass } from '@/lib/calendar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -43,7 +43,7 @@ export function CoverageNeeded() {
                   <span className="font-medium">{r.group_name}</span>
                   <span className="text-muted-foreground">
                     {' '}
-                    · {r.class_name} · minggu dari {r.week_start_date}
+                    · {translateClassName(r.class_name)} · minggu dari {r.week_start_date}
                   </span>
                 </div>
                 {deadline !== null && (
@@ -60,7 +60,7 @@ export function CoverageNeeded() {
                 onClick={() => {
                   if (
                     !window.confirm(
-                      `Konfirmasi kamu akan menggantikan ${r.group_name} · ${r.class_name}, pada ${sessionDayLabel(r.week_start_date, r.class_name)}?`,
+                      `Konfirmasi kamu akan menggantikan ${r.group_name} · ${translateClassName(r.class_name)}, pada ${sessionDayLabel(r.week_start_date, r.class_name)}?`,
                     )
                   )
                     return

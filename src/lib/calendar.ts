@@ -192,6 +192,36 @@ export function weekdayOffsetForClass(className: string | null | undefined): num
   return className && className.toLowerCase().includes('tuesday') ? 1 : 0
 }
 
+const DAY_ID: Record<string, string> = {
+  Monday: 'Senin',
+  Tuesday: 'Selasa',
+  Wednesday: 'Rabu',
+  Thursday: 'Kamis',
+  Friday: 'Jumat',
+  Saturday: 'Sabtu',
+  Sunday: 'Minggu',
+}
+const TIME_OF_DAY_ID: Record<string, string> = {
+  Morning: 'Pagi',
+  Afternoon: 'Siang',
+  Evening: 'Malam',
+  Night: 'Malam',
+}
+
+/**
+ * Hanya untuk tampilan: ganti kata hari/waktu berbahasa Inggris di nama kelas (mis. "Monday
+ * Evening" → "Senin Malam") jadi Indonesia. Nilai ASLI (dari DB) tetap dipakai apa adanya di
+ * semua fungsi lain di file ini (curriculumForClass, weekdayOffsetForClass, dst.) — jangan
+ * pernah teruskan hasil fungsi ini ke fungsi-fungsi tersebut.
+ */
+export function translateClassName(name: string | null | undefined): string {
+  if (!name) return ''
+  let out = name
+  for (const [en, id] of Object.entries(DAY_ID)) out = out.replace(new RegExp(`\\b${en}\\b`, 'g'), id)
+  for (const [en, id] of Object.entries(TIME_OF_DAY_ID)) out = out.replace(new RegExp(`\\b${en}\\b`, 'g'), id)
+  return out
+}
+
 /** 某班某周的实际上课日期：课程周一锚点 + 班级星期偏移（周二班 +1 天）。 */
 export function sessionDateForWeek(
   c: Curriculum,

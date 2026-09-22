@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useAssignmentHistory } from '@/hooks/use-assignments'
+import { translateClassName } from '@/lib/calendar'
 import { Spinner } from '@/components/spinner'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -67,7 +68,7 @@ export function AssignmentHistory() {
                   <TableCell className="tabular-nums whitespace-nowrap">
                     {r.week_start_date}
                   </TableCell>
-                  <TableCell>{r.class_name ?? '—'}</TableCell>
+                  <TableCell>{r.class_name ? translateClassName(r.class_name) : '—'}</TableCell>
                   <TableCell>{r.group_name ?? '—'}</TableCell>
                   <TableCell>
                     <Badge

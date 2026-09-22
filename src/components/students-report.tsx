@@ -6,7 +6,7 @@ import { useAttendanceReport } from '@/hooks/use-attendance'
 import { useDeleteStudent } from '@/hooks/use-groups'
 import { exportStudentMatrix } from '@/lib/report'
 import type { ReportCell } from '@/lib/report'
-import { curriculumForClass, weekForDate } from '@/lib/calendar'
+import { curriculumForClass, translateClassName, weekForDate } from '@/lib/calendar'
 import { ImportStudents } from '@/components/import-admin'
 import { Spinner } from '@/components/spinner'
 import { Button } from '@/components/ui/button'
@@ -195,7 +195,9 @@ export function StudentsReport({ classFilter }: { classFilter: string }) {
                       </span>
                     </TableCell>
                     <TableCell className="text-muted-foreground whitespace-nowrap">{s.email}</TableCell>
-                    <TableCell className="text-muted-foreground whitespace-nowrap">{s.class_name}</TableCell>
+                    <TableCell className="text-muted-foreground whitespace-nowrap">
+                      {translateClassName(s.class_name)}
+                    </TableCell>
                     <TableCell className="text-muted-foreground whitespace-nowrap">{s.group_name}</TableCell>
                     {columns.map((c) => {
                       const cell = cellByStudent[s.id]?.[c.key]

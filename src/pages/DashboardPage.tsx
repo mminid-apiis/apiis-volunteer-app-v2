@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Video } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 import { useMyGroups } from '@/hooks/use-groups'
+import { translateClassName } from '@/lib/calendar'
 import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -38,7 +39,7 @@ export function DashboardPage() {
                   <span>{g.name}</span>
                   {g.class_name && (
                     <Badge variant="outline" className="shrink-0 font-normal">
-                      {g.class_name}
+                      {translateClassName(g.class_name)}
                     </Badge>
                   )}
                 </CardTitle>

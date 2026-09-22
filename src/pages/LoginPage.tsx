@@ -80,7 +80,7 @@ export function LoginPage() {
         <div className="mb-6 flex flex-col items-center text-center">
           <ApiisLogo className="h-24 w-auto" />
           <p className="mt-4 text-sm text-white/70">
-            Pelatihan Abad 21. Untuk Orang Kristen. Gratis
+            21st Century Training. For Christians. For Free
           </p>
         </div>
 

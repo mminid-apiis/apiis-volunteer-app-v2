@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, Video } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 import { useGroup, useStudents } from '@/hooks/use-groups'
-import { useAttendance } from '@/hooks/use-attendance'
+import { useAttendance, useSaveAttendance } from '@/hooks/use-attendance'
 import {
   curriculumForClass,
   currentWeek,
@@ -44,6 +44,7 @@ export function GroupAttendancePage() {
   const sessionDate = picked ?? defaultDate ?? today
 
   const attendanceQ = useAttendance(groupId, sessionDate)
+  const save = useSaveAttendance()
 
   if (groupQ.isLoading || studentsQ.isLoading) return <FullPageSpinner />
   if (groupQ.isError || !group) {
@@ -137,6 +138,8 @@ export function GroupAttendancePage() {
           groupId={groupId as string}
           sessionDate={sessionDate}
           volunteerId={user?.id ?? ''}
+          onSave={(rows) => save.mutateAsync(rows)}
+          saving={save.isPending}
         />
       )}
     </div>

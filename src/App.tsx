@@ -5,6 +5,7 @@ import { RequireRole } from '@/components/require-role'
 import { Layout } from '@/components/layout'
 import { LoginPage } from '@/pages/LoginPage'
 import { ResetPasswordPage } from '@/pages/ResetPasswordPage'
+import { ObsPage } from '@/pages/ObsPage'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { GroupAttendancePage } from '@/pages/GroupAttendancePage'
 import { NotificationsPage } from '@/pages/NotificationsPage'
@@ -18,6 +19,7 @@ import { AdminObsPage } from '@/pages/admin/AdminObsPage'
 import { AdminSchedulingPage } from '@/pages/admin/AdminSchedulingPage'
 import { AdminHistoryPage } from '@/pages/admin/AdminHistoryPage'
 import { AdminFeedbackPage } from '@/pages/admin/AdminFeedbackPage'
+import { AdminAccessLogPage } from '@/pages/admin/AdminAccessLogPage'
 
 /** 已登录时，根据角色跳到对应首页。 */
 function HomeRedirect() {
@@ -30,6 +32,7 @@ function App() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
+      <Route path="/obs" element={<ObsPage />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<HomeRedirect />} />
         <Route element={<Layout />}>
@@ -56,6 +59,7 @@ function App() {
             <Route path="obs" element={<AdminObsPage />} />
             <Route path="scheduling" element={<AdminSchedulingPage />} />
             <Route path="history" element={<AdminHistoryPage />} />
+            <Route path="access-log" element={<AdminAccessLogPage />} />
             <Route path="feedback" element={<AdminFeedbackPage />} />
           </Route>
           <Route path="/groups/:groupId" element={<GroupAttendancePage />} />

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { useSaveAttendance } from '@/hooks/use-attendance'
 import type { AttendanceUpsert } from '@/hooks/use-attendance'
 import type { AttendanceRecord } from '@/types'
 import type { GroupStudent } from '@/hooks/use-groups'
@@ -33,6 +32,8 @@ interface Props {
   groupId: string
   sessionDate: string
   volunteerId: string
+  onSave: (rows: AttendanceUpsert[]) => Promise<void>
+  saving: boolean
 }
 
 const RUBRIC: {
@@ -74,9 +75,15 @@ const RUBRIC: {
   },
 ]
 
-export function AttendanceForm({ students, existing, groupId, sessionDate, volunteerId }: Props) {
-  const save = useSaveAttendance()
-
+export function AttendanceForm({
+  students,
+  existing,
+  groupId,
+  sessionDate,
+  volunteerId,
+  onSave,
+  saving,
+}: Props) {
   // useState 初始化器从已有记录构建表单；父组件用 key={groupId:date} 控制重挂载。
   const [rows, setRows] = useState<Record<string, RowState>>(() => {
     const map: Record<string, RowState> = {}
@@ -113,7 +120,7 @@ export function AttendanceForm({ students, existing, groupId, sessionDate, volun
     }
     setStatus('saving')
     try {
-      await save.mutateAsync(buildPayload())
+      await onSave(buildPayload())
       dirtyRef.current = false
       setStatus('saved')
     } catch (e) {
@@ -121,7 +128,7 @@ export function AttendanceForm({ students, existing, groupId, sessionDate, volun
       setStatus('error')
       toast.error(`Gagal menyimpan: ${(e as Error).message}`)
     }
-  }, [save, buildPayload])
+  }, [onSave, buildPayload])
 
   function update(studentId: string, patch: Partial<RowState>) {
     const next = { ...rowsRef.current, [studentId]: { ...rowsRef.current[studentId], ...patch } }
@@ -137,7 +144,7 @@ export function AttendanceForm({ students, existing, groupId, sessionDate, volun
   useEffect(() => {
     return () => {
       if (timerRef.current) window.clearTimeout(timerRef.current)
-      if (dirtyRef.current) save.mutate(buildPayload())
+      if (dirtyRef.current) void onSave(buildPayload())
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -224,8 +231,8 @@ export function AttendanceForm({ students, existing, groupId, sessionDate, volun
             <span className="text-destructive">Gagal menyimpan — coba "Simpan sekarang"</span>
           )}
         </span>
-        <Button variant="secondary" onClick={() => void persist()} disabled={save.isPending}>
-          {save.isPending ? 'Menyimpan…' : 'Simpan sekarang'}
+        <Button variant="secondary" onClick={() => void persist()} disabled={saving}>
+          {saving ? 'Menyimpan…' : 'Simpan sekarang'}
         </Button>
       </div>
     </div>

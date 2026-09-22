@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { Navigate } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAuth, roleHome } from '@/lib/auth'
@@ -142,7 +142,13 @@ export function LoginPage() {
         </CardContent>
         </Card>
 
-        <p className="mt-6 text-center text-xs text-white/45">Portal OBS APIIS</p>
+        <p className="mt-4 text-center text-xs text-white/60">
+          OBS mau menggantikan rekan?{' '}
+          <Link to="/obs" className="underline hover:text-white">
+            Masuk tanpa login →
+          </Link>
+        </p>
+        <p className="mt-2 text-center text-xs text-white/45">Portal OBS APIIS</p>
       </div>
     </div>
   )

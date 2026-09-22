@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   Menu,
   MessageSquare,
+  Radar,
   Users,
   UserCog,
   X,
@@ -79,6 +80,7 @@ function SidebarContents({ onNavigate }: { onNavigate: () => void }) {
     { to: '/admin/obs', label: 'OBS', icon: UserCog },
     { to: '/admin/scheduling', label: 'Penjadwalan', icon: CalendarClock },
     { to: '/admin/history', label: 'Riwayat', icon: History },
+    { to: '/admin/access-log', label: 'Log Akses OBS', icon: Radar },
     { to: '/admin/feedback', label: 'Masukan', icon: MessageSquare },
   ]
 
